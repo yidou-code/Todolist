@@ -1,28 +1,27 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <MyHeader/>
+  <div class="container">
+
+    <InputSection :filter ="filter" @add-todo = "addTodo" @set-filter = "setFilter"/>
+    <TaskList :filteredTodos ="filteredTodos" @remove-todo = "removeTodo" @update-todo = "updateTodo"/>
+    <MyFooter :renaining ="remaining" :completedCount ="completedCount" @clear-completed = "clearCompleted"/>
+    </div>  
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+import InputSection from './components/InputSection.vue'
+import TaskList from './components/TaskList.vue'
+import MyFooter from './components/MyFooter.vue'
+import MyHeader from './components/MyHeader.vue'
+export default{
+  components:{
+    
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
