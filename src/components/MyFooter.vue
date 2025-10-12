@@ -12,6 +12,11 @@
 <script>
 export default {
 props: ['remaining', 'completedCount'],
+methods: {
+    clearCompleted() {
+      this.$emit('clear-completed')  // 触发清除已完成事件
+    }
+  }
 }
 </script>
 

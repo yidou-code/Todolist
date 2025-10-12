@@ -1,20 +1,22 @@
 <!-- 输入框 -->
 <template>
   <div class="input-section">
+    <!-- 输入框和添加按钮保持不变 -->
     <input type="text" placeholder="添加新任务..." v-model="newTodo" @keyup.enter="addTodo" class="todo-input"/>
     <button @click="addTodo" class="add-btn">
       <i class="fas fa-plus"></i>添加
     </button>
   
-<!-- 过滤按钮 -->
+    <!-- 过滤按钮 -->
     <div class="filters">
-      <button @click="filter = 'all'" :class=" {active: filter === 'all' }" class="fliter-btn">全部</button>
-      <button @click="filter = 'active'" :class=" {active: filter === 'active' }" class="fliter-btn">未完成</button>
-      <button @click="filter = 'completed'" :class=" {active: filter === 'completed' }" class="fliter-btn">已完成</button>
-      
+      <!-- 改为修改本地的 currentFilter -->
+      <button @click="currentFilter = 'all'" :class="{active: currentFilter === 'all'}" class="filter-btn">全部</button>
+      <button @click="currentFilter = 'active'" :class="{active: currentFilter === 'active'}" class="filter-btn">未完成</button>
+      <button @click="currentFilter = 'completed'" :class="{active: currentFilter === 'completed'}" class="filter-btn">已完成</button>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -22,7 +24,8 @@ props: ['filter'],
 emits:['add-todo','set-filter'],
 data( ){
   return {
-    newTodo: ''
+    newTodo: '',
+      currentFilter: this.filter  // 本地状态，初始值来自 props
   } 
 },
   methods:{
@@ -35,8 +38,12 @@ data( ){
   }
   },
   watch:{
-    filter(newVal){
-    this.$emit('set-filter',newVal)
+      currentFilter(newVal) {
+      this.$emit('set-filter', newVal);
+    },
+    // 监听父组件传递的 filter 变化，同步到本地状态
+    filter(newVal) {
+      this.currentFilter = newVal;
   }
   }
 
@@ -49,7 +56,7 @@ display: flex;
 flex-direction:column;
 gap:1rem;
 margin-bottom: 2rem;
-padding: o 1rem;
+padding: 0 1rem;
 }
 .todo-input{
   padding: 0.8rem 1rem;
@@ -64,7 +71,7 @@ padding: o 1rem;
 }
 .add-btn{
   padding: 0.8rem 1.5rem;
-  background-color: #42b983;
+  background-color: #1d7f5b4a;
   color:white;
   border:none;
   border-radius: 4px;
@@ -77,7 +84,7 @@ padding: o 1rem;
   gap:  0.5rem;
 }
 .add-btn:hover{
-  background-color: #359e6d
+  background-color: #873f6d60
 
 }
 .filters{
@@ -85,7 +92,7 @@ padding: o 1rem;
   gap:0.5rem;
   justify-content: center;
 }
-.fliter-btn{
+.filter-btn{
   padding: 0.5rem 1rem;
   border:1px solid white;
   background-color: white ;
@@ -99,7 +106,7 @@ padding: o 1rem;
   border-color: #42b983;
 
 }
-.fliter-btn:hover:not(.active){
+.filter-btn:hover:not(.active){
   border-color:#42b983;
   color: #42b983;
 }

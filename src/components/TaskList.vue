@@ -2,7 +2,7 @@
   <div class="todo-list">
     <div v-for = "(todo, index) in filteredTodos" :key="index" class="todo-item" :class="{completed: todo.completed}">
       <div class="todo-check">
-        <input type="checkbox" name="" id="" class="checkbox" v-model="todo.completed" @change="$emit('update-todo', index, todo.completed)"/>
+        <input type="checkbox" name="" id="" class="checkbox" v-model="todo.completed" @change="$emit('update-todo', index, { ...todo, completed: todo.completed })"/>
       
       </div> 
       <div class="todo-text">{{ todo.text }}</div>
@@ -22,19 +22,28 @@
 
 <script>
 export default {
-  props:[filteredTodos]
+  props:['filteredTodos']
 
 }
 </script>
 
 <style scoped>
 .todo-list {
+  
+  align-content: baseline;
+  margin: 0 auto ;
   padding:0 1rem;
+  width: 50%;
+  height: 600px;
+
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.598);
 }
 .todo-item {
   display:flex;
   align-items: center;
-  padding: 1 rem;
+  padding: 1rem;
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s;
 }
@@ -82,7 +91,7 @@ color: #888;
 }
 .anime-icon{
   font-size: 3rem;
-  margin: bottom 1rem;
+  margin-bottom:1rem;
   opacity: 0.6;
 }
 </style>
