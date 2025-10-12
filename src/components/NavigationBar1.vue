@@ -21,7 +21,7 @@
       </div>
       <ul class="nav-links">
         <li class="nav-item">
-          <router-link to="/" class="nav-link">任务</router-link>
+          <router-link to="/Todolist" class="nav-link">任务</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/background" class="nav-link">背景图</router-link>
