@@ -5,7 +5,7 @@
         <!-- 用户头像区域，点击跳转到登录 -->
         <div class="user-avatar" @click="goToLogin">
           <div class="anime-img">
-            <img :src="userAvatar" alt="用户头像" class="avatar-img" />
+           <img :src="computedUserAvatar" alt="用户头像" class="avatar-img" @error="handleAvatarError"/>
             <div class="online-status" :class="isOnline ? 'online' : 'offline'"></div>
           </div>
           <div class="user-info">
@@ -53,7 +53,9 @@ export default {
       // 用户相关数据
       userName: '',
       userAvatar: require('../assets/可莉.jpg'), // 默认头像
-      isOnline: false
+      isOnline: false,
+      // 添加一个强制更新的计数器
+      updateCounter: 0
     }
   },
   computed: {
@@ -92,6 +94,22 @@ export default {
           opacity: opacity / 100
         }
       }
+    },
+    // 添加计算属性来强制更新头像
+    computedUserAvatar() {      
+      // 这个计算属性依赖 updateCounter，当它变化时会强制重新计算
+      this.updateCounter;
+      return this.getCurrentAvatar();
+    }
+  },
+  watch: {
+    // 监听路由变化，当跳转到任务页面时重新加载用户信息
+    '$route'(to) {
+      // 移除了未使用的 'from' 参数
+      if (to.name === 'MyHome') {
+        console.log('路由跳转到任务页面，重新加载用户信息');
+        this.loadUserInfo();
+      }
     }
   },
   mounted() {
@@ -107,29 +125,117 @@ export default {
     
     // 加载用户信息
     this.loadUserInfo();
+    
+    // 监听用户登录状态变化
+    this.$eventBus.$on('userLoggedIn', this.handleUserLoggedIn);
+    this.$eventBus.$on('userAvatarUpdated', this.handleUserAvatarUpdated);
+    this.$eventBus.$on('userLoggedOut', this.handleUserLoggedOut);
+    
+    console.log('导航栏组件已挂载，开始监听用户事件');
   },
   beforeUnmount() {
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
     }
+    // 移除事件监听
+    this.$eventBus.$off('userLoggedIn', this.handleUserLoggedIn);
+    this.$eventBus.$off('userAvatarUpdated', this.handleUserAvatarUpdated);
+    this.$eventBus.$off('userLoggedOut', this.handleUserLoggedOut);
   },
   methods: {
+    // 处理用户登录事件
+    handleUserLoggedIn(userData) {
+      console.log('导航栏收到用户登录事件:', userData);
+      this.loadUserInfo();
+      // 强制更新
+      this.updateCounter++;
+    },
+    
+   // 处理用户头像更新事件
+handleUserAvatarUpdated(avatarData) {
+  console.log('导航栏收到头像更新事件:', avatarData);
+  console.log('当前用户信息:', this.getUserInfo());
+  
+  // 确保avatarData包含正确的URL
+  if (avatarData && avatarData.avatarUrl) {
+    console.log('新头像URL:', avatarData.avatarUrl);
+    this.userAvatar = avatarData.avatarUrl;
+    
+    // 更新本地存储
+    const userInfo = this.getUserInfo();
+    if (userInfo) {
+      userInfo.avatar = avatarData.avatarUrl;
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      console.log('更新后的本地存储:', userInfo);
+    }
+    
+    // 强制更新
+    this.updateCounter++;
+    console.log('updateCounter 已增加:', this.updateCounter);
+  } else {
+    console.error('头像数据格式错误:', avatarData);
+  }
+},
+    
+    // 处理用户注销事件
+    handleUserLoggedOut() {
+      console.log('导航栏收到用户注销事件');
+      this.resetToDefault();
+      this.updateCounter++;
+    },
+
+    // 头像加载错误处理
+    handleAvatarError(event) {
+      console.warn('头像加载失败，使用默认头像');
+      event.target.src = require('../assets/可莉.jpg');
+    },
+
+// 获取当前头像（带缓存清除）
+getCurrentAvatar() {
+  const userInfo = this.getUserInfo();
+  if (userInfo && userInfo.avatar) {
+    // 检查是否是Base64数据URL或外部URL
+    if (userInfo.avatar.startsWith('data:image') || userInfo.avatar.startsWith('http')) {
+      // Base64数据URL或外部URL，直接返回，不添加时间戳
+      return userInfo.avatar;
+    } else {
+      // 本地资源路径，可能需要添加时间戳
+      const timestamp = new Date().getTime();
+      return `${userInfo.avatar}?t=${timestamp}`;
+    }
+  }
+  return require('../assets/可莉.jpg');
+},
+    // 获取用户信息
+    getUserInfo() {
+      try {
+        const userInfo = localStorage.getItem('userInfo');
+        return userInfo ? JSON.parse(userInfo) : null;
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+        return null;
+      }
+    },
+
     // 加载用户信息
     loadUserInfo() {
-      const userInfo = localStorage.getItem('userInfo');
+      console.log('开始加载用户信息...');
+      const userInfo = this.getUserInfo();
       if (userInfo) {
-        try {
-          const user = JSON.parse(userInfo);
-          this.userName = user.name || '';
-          this.userAvatar = user.avatar || require('../assets/可莉.jpg');
-          this.isOnline = user.isOnline || false;
-        } catch (error) {
-          console.error('解析用户信息失败:', error);
-          this.resetToDefault();
-        }
+        console.log('找到用户信息:', userInfo);
+        this.userName = userInfo.name || '';
+        this.userAvatar = userInfo.avatar || require('../assets/可莉.jpg');
+        this.isOnline = userInfo.isOnline || false;
+        
+        // 强制更新视图
+        this.$nextTick(() => {
+          this.updateCounter++;
+        });
       } else {
+        console.log('未找到用户信息，使用默认状态');
         this.resetToDefault();
       }
+      console.log('导航栏加载用户信息：', userInfo);
     },
 
     // 重置为默认状态
@@ -152,7 +258,6 @@ export default {
 
     // 显示用户菜单
     showUserMenu() {
-      // 直接使用确认对话框，避免定义未使用的变量
       if (confirm(`${this.userName}，您想要执行什么操作？\n\n点击"确定"查看资料，点击"取消"退出登录`)) {
         this.viewProfile();
       } else {
@@ -169,7 +274,10 @@ export default {
     logout() {
       if (confirm('确定要退出登录吗？')) {
         localStorage.removeItem('userInfo');
+        localStorage.removeItem('token');
         this.resetToDefault();
+        // 发出用户注销事件
+        this.$eventBus.$emit('userLoggedOut');
         alert('已退出登录');
       }
     },
@@ -210,6 +318,7 @@ export default {
 }
 </script>
 
+<!-- 样式保持不变 -->
 <style scoped>
 .navbar {
   background-image: url('../assets/原神导航栏背景图.png');

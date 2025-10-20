@@ -49,6 +49,10 @@ export default {
     }
   },
   computed: {
+     showNavigation() {
+      // 在登录和注册页面隐藏导航栏
+      return this.$route.name !== 'Login' && this.$route.name !== 'Register'
+    },
     filteredTodos() {
       switch (this.currentFilter) {
         case 'active':
