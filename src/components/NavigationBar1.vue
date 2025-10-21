@@ -258,7 +258,7 @@ getCurrentAvatar() {
         this.showUserMenu();
       } else {
         // 如果未登录，跳转到登录页面
-        this.$router.push('/login');
+        this.$router.push('/Todolist/login');
       }
     },
 
@@ -339,7 +339,7 @@ performLogout() {
   
   // 使用最可靠的方式跳转
   setTimeout(() => {
-    window.location.href = '/login';
+    window.location.href = '/Todolist/login';
   }, 100);
 },
     // 随机选择一个时钟图标类

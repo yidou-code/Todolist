@@ -11,7 +11,7 @@ const routes = [
   // 默认路由重定向到登录页
   {
     path: '/',
-    redirect: '/login'
+    redirect: '/Todolist/login'
   },
   // 主页 - 任务清单
   {
@@ -24,7 +24,7 @@ const routes = [
   },
   // 登录页面
   {
-    path: '/login',
+    path: '/Todolist/login',
     name: 'Login',
     component: LoginInterface,
     meta: {

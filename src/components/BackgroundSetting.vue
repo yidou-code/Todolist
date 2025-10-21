@@ -463,6 +463,9 @@ export default {
         
         // 计算实际裁剪区域（反向缩放）
         const actualCropX = crop.x / scale;
+
+
+        
         const actualCropY = crop.y / scale;
         const actualCropWidth = crop.width / scale;
         const actualCropHeight = crop.height / scale;

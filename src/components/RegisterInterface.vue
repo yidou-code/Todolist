@@ -365,7 +365,7 @@ showError(message) {
     type: 'alert',
     theme: 'warning',
     character: 'fox',
-    icon: 'bi bi-exclamation-triangle',
+    icon: 'fas fa-exclamation-triangle',
     confirmText: '重新填写'
   });
 },
