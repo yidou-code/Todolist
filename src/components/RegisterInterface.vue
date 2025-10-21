@@ -357,11 +357,18 @@ export default {
       }
     },
 
-    // 显示错误消息
-    showError(message) {
-      alert(message) // 可以用更优雅的方式替换
-    },
-
+// 显示错误信息
+showError(message) {
+  this.$eventBus.$emit('showAnimeModal', {
+    title: '注册失败',
+    message: message,
+    type: 'alert',
+    theme: 'warning',
+    character: 'fox',
+    icon: 'bi bi-exclamation-triangle',
+    confirmText: '重新填写'
+  });
+},
     // 注册提交处理
     async handleSubmit() {
       if (!this.validateForm()) {
@@ -423,7 +430,7 @@ export default {
 
 <style scoped>
 .register-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -488,6 +495,7 @@ export default {
   color: #333;
   margin: 0 0 0.5rem 0;
   background: linear-gradient(135deg, #42b983, #359e6d);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

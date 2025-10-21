@@ -4,7 +4,7 @@
       <!-- 返回主页按钮 -->
       <div class="back-section">
         <button class="back-btn" @click="goToHome">
-          <i class="fas fa-arrow-left"></i>
+          <i class="bi bi-arrow-left"></i>
           返回主页
         </button>
       </div>
@@ -306,11 +306,7 @@ confirmAvatar() {
       return !Object.values(errors).some(error => error !== '');
     },
 
-    // 忘记密码提示
-    showForgotPassword() {
-      alert('忘记密码功能暂未开放，请联系管理员重置密码。');
-    },
-
+  
     // 模拟用户验证
     validateUserCredentials(username, password) {
       // 从本地存储获取注册用户列表
@@ -424,23 +420,55 @@ async handleSubmit() {
     this.isSubmitting = false;
   }
 },
-    // 显示消息（简单版本）
-    showMessage(message, type = 'info') {
-      if (type === 'error') {
-        alert('错误: ' + message);
-      } else if (type === 'success') {
-        alert('成功: ' + message);
-      } else {
-        alert(message);
-      }
+// 显示消息（宠物风格）
+showMessage(message, type = 'info') {
+  const themes = {
+    error: { 
+      theme: 'warning', 
+      character: 'fox', 
+      icon: 'fas fa-exclamation-triangle' 
+    },
+    success: { 
+      theme: 'cute', 
+      character: 'cat', 
+      icon: 'fas fa-check-circle' 
+    },
+    info: { 
+      theme: 'cute', 
+      character: 'rabbit', 
+      icon: 'fas fa-comment' 
     }
+  };
+  
+  const themeConfig = themes[type] || themes.info;
+  
+  this.$eventBus.$emit('showAnimeModal', {
+    title: type === 'error' ? '出错了' : type === 'success' ? '成功' : '提示',
+    message: message,
+    type: 'alert',
+    ...themeConfig,
+    confirmText: '确定'
+  });
+},
+// 忘记密码提示
+showForgotPassword() {
+  this.$eventBus.$emit('showAnimeModal', {
+    title: '忘记密码',
+    message: '忘记密码功能暂未开放<br><small>请联系管理员重置密码</small>',
+    type: 'alert',
+    theme: 'cute',
+    character: 'panda',
+    icon: 'fas fa-key',
+    confirmText: '知道了'
+  });
+},
   }
 }
 </script>
 
 <style scoped>
 .login-container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   align-items: center;
   justify-content: center;

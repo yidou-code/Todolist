@@ -2,7 +2,7 @@
   <div id="app">
     <!-- 选择其中一个导航栏组件使用 -->
     <NavigationBar1 />
-    
+     <ModalManager />
     <!-- <NavigationBar2 /> -->
     <!-- <NavigationBar3 /> -->
     <!-- <NavigationBar4 /> -->
@@ -17,6 +17,7 @@
 <script>
 // 导入所有导航栏组件，根据需要注释/取消注释
 import NavigationBar1 from './components/NavigationBar1.vue'
+import ModalManager from '@/components/ModalManager.vue'
 // import NavigationBar2 from './components/NavigationBar2.vue'
 // import NavigationBar3 from './components/NavigationBar3.vue'
 // import NavigationBar4 from './components/NavigationBar4.vue'
@@ -33,6 +34,7 @@ export default {
   name: 'App',
   components: {
     NavigationBar1,
+     ModalManager
     // NavigationBar2,
     // NavigationBar3,
     // NavigationBar4,
@@ -48,6 +50,14 @@ export default {
       currentFilter: 'all'
     }
   },
+
+
+ watch:{
+  '$route'(to, from) {
+      console.log(`路由变化: ${from.path} -> ${to.path}`);
+    }
+ },
+
   computed: {
      showNavigation() {
       // 在登录和注册页面隐藏导航栏

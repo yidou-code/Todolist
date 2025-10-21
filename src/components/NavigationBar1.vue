@@ -55,7 +55,8 @@ export default {
       userAvatar: require('../assets/可莉.jpg'), // 默认头像
       isOnline: false,
       // 添加一个强制更新的计数器
-      updateCounter: 0
+      updateCounter: 0,
+      boundMethods: null
     }
   },
   computed: {
@@ -120,6 +121,11 @@ export default {
       this.calculateCountdown();
     }, 1000);
 
+    this.boundMethods = {
+    viewProfile: this.viewProfile.bind(this),
+    showLogoutConfirm: this.showLogoutConfirm.bind(this),
+    performLogout: this.performLogout.bind(this)
+  };
     // 初始化时随机选择一个时钟图标
     this.randomClockClass = this.getRandomClock();
     
@@ -256,32 +262,86 @@ getCurrentAvatar() {
       }
     },
 
-    // 显示用户菜单
-    showUserMenu() {
-      if (confirm(`${this.userName}，您想要执行什么操作？\n\n点击"确定"查看资料，点击"取消"退出登录`)) {
-        this.viewProfile();
-      } else {
-        this.logout();
-      }
-    },
 
-    // 查看用户资料
-    viewProfile() {
-      alert(`用户资料:\n\n姓名: ${this.userName}\n状态: ${this.isOnline ? '在线' : '离线'}`);
+ // 显示用户菜单
+showUserMenu() {
+  this.$eventBus.$emit('showAnimeModal', {
+    title: '用户操作',
+    message: `${this.userName}，您想要执行什么操作？`,
+    type: 'confirm',
+    theme: 'cute',
+    character: 'cat',
+    icon: 'bi bi-person-circle',
+    confirmText: '查看资料',
+    cancelText: '退出登录',
+    onConfirm: () => {
+      console.log("用户点击了查看资料");
+      this.viewProfile();
     },
+    onCancel: () => {
+      console.log("用户点击了退出登录");
+      this.showLogoutConfirm();
+    }
+  });
+},
 
-    // 退出登录
-    logout() {
-      if (confirm('确定要退出登录吗？')) {
-        localStorage.removeItem('userInfo');
-        localStorage.removeItem('token');
-        this.resetToDefault();
-        // 发出用户注销事件
-        this.$eventBus.$emit('userLoggedOut');
-        alert('已退出登录');
-      }
+// 查看用户资料
+viewProfile() {
+  this.$eventBus.$emit('showAnimeModal', {
+    title: '用户资料',
+    message: `👤 <strong>${this.userName}</strong><br>📱 状态: ${this.isOnline ? '🟢 在线' : '⚫ 离线'}`,
+    type: 'alert',
+    theme: 'cute',
+    character: 'rabbit',
+    icon: 'bi bi-info-circle',
+    confirmText: '好的'
+  });
+},
+
+// 显示退出登录确认
+showLogoutConfirm() {
+  this.$eventBus.$emit('showAnimeModal', {
+    title: '退出登录',
+    message: '确定要退出登录吗？<br><small>我们会想念你的～</small>',
+    type: 'confirm',
+    theme: 'cute',
+    character: 'dog',
+    icon: 'bi bi-box-arrow-right',
+    confirmText: '退出登录',
+    cancelText: '再想想',
+    onConfirm: () => {
+      console.log("用户确认退出登录");
+      this.performLogout();
     },
+    onCancel: () => {
+      console.log("用户取消退出登录");
+    }
+  });
+},
 
+// 执行退出登录
+performLogout() {
+  console.log('开始执行退出登录');
+  
+  // 清除用户相关数据
+  localStorage.removeItem('userInfo');
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('rememberedUser');
+  
+  // 重置组件状态
+  this.resetToDefault();
+  
+  // 发出用户注销事件
+  this.$eventBus.$emit('userLoggedOut');
+  
+  console.log('用户数据已清除，准备跳转');
+  
+  // 使用最可靠的方式跳转
+  setTimeout(() => {
+    window.location.href = '/login';
+  }, 100);
+},
     // 随机选择一个时钟图标类
     getRandomClock() {
       const randomIndex = Math.floor(Math.random() * this.clockIconClasses.length);
@@ -313,7 +373,9 @@ getCurrentAvatar() {
       this.hours = hoursDiff.toString().padStart(2, '0');
       this.minutes = minutesDiff.toString().padStart(2, '0');
       this.seconds = secondsDiff.toString().padStart(2, '0');
-    }
+    },
+
+    
   }
 }
 </script>
